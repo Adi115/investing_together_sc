@@ -29,6 +29,7 @@ library Address {
         // constructor execution.
 
         uint256 size;
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             size := extcodesize(account)
         }
@@ -57,7 +58,8 @@ library Address {
             "Address: insufficient balance"
         );
 
-        (bool success, ) = recipient.call{value: amount}("");
+        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
+        (bool success, ) = recipient.call{ value: amount }("");
         require(
             success,
             "Address: unable to send value, recipient may have reverted"
@@ -66,7 +68,7 @@ library Address {
 
     /**
      * @dev Performs a Solidity function call using a low level `call`. A
-     * plain `call` is an unsafe replacement for a function call: use this
+     * plain`call` is an unsafe replacement for a function call: use this
      * function instead.
      *
      * If `target` reverts with a revert reason, it is bubbled up by this
@@ -146,9 +148,9 @@ library Address {
         );
         require(isContract(target), "Address: call to non-contract");
 
-        (bool success, bytes memory returndata) = target.call{value: value}(
-            data
-        );
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) =
+            target.call{ value: value }(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
@@ -184,6 +186,7 @@ library Address {
     ) internal view returns (bytes memory) {
         require(isContract(target), "Address: static call to non-contract");
 
+        // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory returndata) = target.staticcall(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
@@ -219,6 +222,7 @@ library Address {
     ) internal returns (bytes memory) {
         require(isContract(target), "Address: delegate call to non-contract");
 
+        // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory returndata) = target.delegatecall(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
@@ -235,6 +239,7 @@ library Address {
             if (returndata.length > 0) {
                 // The easiest way to bubble the revert reason is using memory via assembly
 
+                // solhint-disable-next-line no-inline-assembly
                 assembly {
                     let returndata_size := mload(returndata)
                     revert(add(32, returndata), returndata_size)
